@@ -1,0 +1,28 @@
+
+spring:
+  profiles:
+    active: mysql
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate:
+        default_batch_fetch_size: 1000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: jdbc:mysql://localhost:3306/springbatch?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: password
+  batch:
+    job:
+      enabled: true
+#      names: ${job.name:NONE}
+#    jdbc:
+#      initialize-schema: always
