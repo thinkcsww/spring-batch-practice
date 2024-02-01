@@ -23,6 +23,6 @@ spring:
   batch:
     job:
       enabled: true
-#      names: ${job.name:NONE}
+      name: mySimpleFlowJob
 #    jdbc:
 #      initialize-schema: always

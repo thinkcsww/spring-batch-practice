@@ -1,4 +1,4 @@
-package com.applory.mybatch.simplejob;
+package com.applory.mybatch.job.simpletaskletjob;
 
 import com.applory.mybatch.domain.Customer;
 import com.applory.mybatch.domain.CustomerRepository;
@@ -14,13 +14,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JpaItemWriter;
-import org.springframework.batch.item.database.JpaPagingItemReader;
-import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +24,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class SimpleJobConfiguration {
+public class SimpleTaskletJob {
 
 
     private final JobRepository jobRepository;
@@ -43,17 +36,17 @@ public class SimpleJobConfiguration {
     private final EntityManagerFactory entityManagerFactory;
 
     @Bean
-    public Job simpleJob() {
-        return new JobBuilder("simpleJob", jobRepository)
-                .start(simpleChunckOrientedStep())
+    public Job mySimpleTaskletJob() {
+        return new JobBuilder("mySimpleTaskletJob", jobRepository)
+                .start(simpleTaskletStep1())
+                .next(simpleTaskletStep2())
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
 
     @Bean
-    public Step simpleTaskletStep() {
-
-        return new StepBuilder("name", jobRepository)
+    public Step simpleTaskletStep1() {
+        return new StepBuilder("mySimpleTaskletJob1", jobRepository)
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
@@ -63,7 +56,7 @@ public class SimpleJobConfiguration {
                         customers.forEach(customer -> {
                             customer.setCount(customer.getCount() + 1);
                         });
-                        log.info("this is my tasklet!!");
+                        log.info("this is my simpleTaskletStep1!!");
 
                         return RepeatStatus.FINISHED;
                     }
@@ -72,38 +65,22 @@ public class SimpleJobConfiguration {
     }
 
     @Bean
-    public Step simpleChunckOrientedStep() {
-        return new StepBuilder("simpleChunckOrientedStep", jobRepository)
-                .<Customer, Customer>chunk(50, platformTransactionManager)
-                .reader(itemReader())
-                .processor(itemProcessor())
-                .writer(itemWriter())
+    public Step simpleTaskletStep2() {
+        return new StepBuilder("mySimpleTaskletJob2", jobRepository)
+                .tasklet(new Tasklet() {
+                    @Override
+                    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+                        List<Customer> customers = customerRepository.findAll();
+
+                        customers.forEach(customer -> {
+                            customer.setCount(customer.getCount() + 1);
+                        });
+                        log.info("this is simpleTaskletStep2!!");
+
+                        return RepeatStatus.FINISHED;
+                    }
+                }, platformTransactionManager)
                 .build();
     }
 
-    @Bean
-    public ItemReader<Customer> itemReader() {
-        return new JpaPagingItemReaderBuilder<Customer>()
-                .name("itemReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(50)
-                .queryString("select c from Customer c")
-                .build();
-    }
-
-    @Bean
-    public ItemProcessor<Customer, Customer> itemProcessor() {
-        return item -> {
-            item.setCount(item.getCount() + 1);
-            return item;
-        };
-    }
-
-    @Bean
-    public ItemWriter<Customer> itemWriter() {
-        return new JpaItemWriterBuilder<Customer>()
-                .entityManagerFactory(entityManagerFactory)
-                .build();
-
-    }
 }
