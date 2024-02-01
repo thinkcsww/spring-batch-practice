@@ -1,16 +1,19 @@
 package com.applory.mybatch.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "customer")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Customer {
 
     @Id
@@ -25,19 +28,4 @@ public class Customer {
 
     private int count;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setBirthdate(LocalDateTime birthdate) {
-        this.birthdate = birthdate;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 }
