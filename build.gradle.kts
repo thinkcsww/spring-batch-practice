@@ -24,7 +24,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-quartz")
+    implementation("org.springframework.batch:spring-batch-integration")
+//    implementation("org.springframework.boot:spring-boot-starter-quartz")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.mysql:mysql-connector-j")
     annotationProcessor("org.projectlombok:lombok")

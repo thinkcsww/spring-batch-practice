@@ -17,6 +17,11 @@ public class MyPartitioner implements Partitioner {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /**
+     * ExecutionContext에 원하는 변수를 넣고 Step에서 Scope를 활용하여 받아서 사용
+     * @param gridSize the size of the map to return
+     * @return
+     */
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
         Integer min = jdbcTemplate.queryForObject("select min(id) from customer", Integer.class);
